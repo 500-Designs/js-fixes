@@ -7,11 +7,6 @@
         $(document).on('submit_success', '.gw-contact-form', (e) => {
             console.debug("form submission successful");
             $formFields.hide();
-
-            var $form2 = $('#accidental_donation_form');
-            $form2.parentsUntil('.dialog-lightbox-widget-content').height('auto');
-            $form2.children().not('.elementor-message').hide();
-            $form2.parent().parent().siblings().hide();
         });
 
         // hide form when ERROR
@@ -19,11 +14,11 @@
             var $formErrorScreen = $('.gw-contact-form .elementor-message-danger');
 
             if ($formErrorScreen.length > 0) {
+                console.log("form error message loaded...");
                 initErrorMods();
             }
         }
 
-        var $button = $('.gw-contact-form button[type="submit"]');
         var observer = new MutationObserver(function (mutations) {
             checkIfErrorExists();
         });
@@ -41,7 +36,66 @@
             });
         }
 
-    });
 
+    // START: Mod for Accidental donation form pop-up on page /donate-goods
+
+        function hideFormFields(formSelector) {
+            var $form = $(formSelector);
+        
+            // Make parent elements expand to fit the form content
+            $form.parentsUntil('.dialog-lightbox-widget-content').height('auto');
+        
+            // Hide all children except for elements with class 'elementor-message'
+            $form.children().not('.elementor-message').hide();
+        
+            // Hide siblings of the parent element of the form
+            $form.parent().parent().siblings().hide();
+          }
+
+        // detect when the form is intialized from pop-up
+        $(document).on('elementor/popup/show', function () {
+            console.log("pop-up shown...!");
+
+            // Select the form and the div element
+            const formElement = document.getElementById("accidental_donation_form");
+            const errorClassName = "elementor-message-danger";
+            const successClassName = "elementor-message-success";
+
+            // Callback function to execute when mutations are observed
+            const callback = function (mutationsList, observer) {
+                for (const mutation of mutationsList) {
+                    if (mutation.type === "childList") {
+
+                        const errorElement = Array.from(mutation.addedNodes).filter(node =>
+                            node.classList && node.classList.contains(errorClassName)
+                        );
+                        if (errorElement.length > 0) {
+                            console.log("ERROR...!");
+                            hideFormFields('#accidental_donation_form');
+                        }
+
+                        const successElement = Array.from(mutation.addedNodes).filter(node =>
+                            node.classList && node.classList.contains(successClassName)
+                        );
+
+                        if (successElement.length > 0) {
+                            console.log("SUCCESS...!");
+                            hideFormFields('#accidental_donation_form');
+                        }
+
+                    }
+                }
+            };
+
+            // Create a new observer instance
+            const observer = new MutationObserver(callback);
+
+            // Start observing the form for childList mutations
+            observer.observe(formElement, { childList: true });
+        });
+
+    // END: Mod for Accidental donation form pop-up on page /donate-goods
+
+    });
 
 </script>
