@@ -5,9 +5,14 @@
 
         // hide form when SUCCESS
         $(document).on('submit_success', '.gw-contact-form', (e) => {
+            console.debug("form submission successful");
             $formFields.hide();
-        });
 
+            var $form2 = $('#accidental_donation_form');
+            $form2.parentsUntil('.dialog-lightbox-widget-content').height('auto');
+            $form2.children().not('.elementor-message').hide();
+            $form2.parent().parent().siblings().hide();
+        });
 
         // hide form when ERROR
         function checkIfErrorExists() {
@@ -17,12 +22,11 @@
                 initErrorMods();
             }
         }
+
         var $button = $('.gw-contact-form button[type="submit"]');
         var observer = new MutationObserver(function (mutations) {
             checkIfErrorExists();
         });
-        observer.observe($button[0], { attributes: true });
-
 
         // show form when TRY AGAIN
         function initErrorMods() {
