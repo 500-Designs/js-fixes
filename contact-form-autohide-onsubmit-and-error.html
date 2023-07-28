@@ -1,0 +1,43 @@
+<script>
+    jQuery(document).ready(($) => {
+
+        var $formFields = $('.gw-contact-form .elementor-form-fields-wrapper');
+
+        // hide form when SUCCESS
+        $(document).on('submit_success', '.gw-contact-form', (e) => {
+            $formFields.hide();
+        });
+
+
+        // hide form when ERROR
+        function checkIfErrorExists() {
+            var $formErrorScreen = $('.gw-contact-form .elementor-message-danger');
+
+            if ($formErrorScreen.length > 0) {
+                initErrorMods();
+            }
+        }
+        var $button = $('.gw-contact-form button[type="submit"]');
+        var observer = new MutationObserver(function (mutations) {
+            checkIfErrorExists();
+        });
+        observer.observe($button[0], { attributes: true });
+
+
+        // show form when TRY AGAIN
+        function initErrorMods() {
+            var $tryAgainBUtton = $('.gw-contact-form a[href="javascript:location.reload()"][aria-label="try again message button"]');
+            var $formErrorScreen = $('.gw-contact-form .elementor-message-danger');
+            $formErrorScreen.show();
+            $formFields.hide();
+            $tryAgainBUtton.on('click', function (e) {
+                e.preventDefault();
+                $formFields.show();
+                $formErrorScreen.hide();
+            });
+        }
+
+    });
+
+
+</script>

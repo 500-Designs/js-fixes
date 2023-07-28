@@ -4,7 +4,6 @@
 <head>
     <title>My First HTML Page</title>
 
-    
     <style>
         /* Modal styles */
         .modal {
@@ -26,6 +25,9 @@
             border: 1px solid #888;
             width: 90%;
             max-width: 600px;
+            position: relative;
+            box-shadow: 0px 4px 50px 0px rgba(31, 31, 58, 0.15);
+            border-radius: 32px;
         }
 
         .close {
@@ -34,6 +36,12 @@
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
+            background-color: #F0F0E7;
+            width: 32px;
+            height: 32px;
+            border-radius: 100%;
+            text-align: center;
+            line-height: 32px;
         }
 
         .close:hover,
@@ -42,6 +50,123 @@
             text-decoration: none;
             cursor: pointer;
         }
+
+        .close svg {}
+
+        .close svg path {
+            fill: #03363D;
+        }
+
+        /* Loading indicator styles */
+        .lds-roller {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .lds-roller div {
+            animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            transform-origin: 40px 40px;
+        }
+
+        .lds-roller div:after {
+            content: " ";
+            display: block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #03363D;
+            margin: -4px 0 0 -4px;
+            position: absolute;
+            margin: auto;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .lds-roller div:nth-child(1) {
+            animation-delay: -0.036s;
+        }
+
+        .lds-roller div:nth-child(1):after {
+            top: 63px;
+            left: 63px;
+        }
+
+        .lds-roller div:nth-child(2) {
+            animation-delay: -0.072s;
+        }
+
+        .lds-roller div:nth-child(2):after {
+            top: 68px;
+            left: 56px;
+        }
+
+        .lds-roller div:nth-child(3) {
+            animation-delay: -0.108s;
+        }
+
+        .lds-roller div:nth-child(3):after {
+            top: 71px;
+            left: 48px;
+        }
+
+        .lds-roller div:nth-child(4) {
+            animation-delay: -0.144s;
+        }
+
+        .lds-roller div:nth-child(4):after {
+            top: 72px;
+            left: 40px;
+        }
+
+        .lds-roller div:nth-child(5) {
+            animation-delay: -0.18s;
+        }
+
+        .lds-roller div:nth-child(5):after {
+            top: 71px;
+            left: 32px;
+        }
+
+        .lds-roller div:nth-child(6) {
+            animation-delay: -0.216s;
+        }
+
+        .lds-roller div:nth-child(6):after {
+            top: 68px;
+            left: 24px;
+        }
+
+        .lds-roller div:nth-child(7) {
+            animation-delay: -0.252s;
+        }
+
+        .lds-roller div:nth-child(7):after {
+            top: 63px;
+            left: 17px;
+        }
+
+        .lds-roller div:nth-child(8) {
+            animation-delay: -0.288s;
+        }
+
+        .lds-roller div:nth-child(8):after {
+            top: 56px;
+            left: 12px;
+        }
+
+        @keyframes lds-roller {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
@@ -49,7 +174,7 @@
     <h1>Auto fill email on zoho form pop-up</h1>
     <p>This is a basic HTML5 page.</p>
 
-    <div id="emailForm">
+    <div id="autoFillZohoEmailForm">
         <label for="emailInput">Email:</label>
         <input type="email" id="emailInput" name="email" required>
         <button id="submitButton" disabled>Submit</button>
@@ -58,7 +183,22 @@
     <!-- Modal -->
     <div id="myModal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
+            <span class="close"><svg class="svg-icon" aria-hidden="true" role="img" focusable="false" width="24"
+                    height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12.2218 13.6066L20 21.3848L21.4142 19.9706L13.636 12.1924L21.3848 4.44366L19.9706 3.02945L12.2218 10.7782L4.44365 3L3.02944 4.41421L10.8076 12.1924L3 20L4.41421 21.4142L12.2218 13.6066Z"
+                        fill="currentColor"></path>
+                </svg></span>
+            <div id="loadingIndicator" class="lds-roller">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
             <div id="formContainer"></div>
         </div>
     </div>
@@ -68,6 +208,7 @@
         var submitButton = document.getElementById("submitButton");
         var modal = document.getElementById("myModal");
         var closeButton = document.getElementsByClassName("close")[0];
+        var loadingIndicator = document.getElementById("loadingIndicator");
 
         emailInput.addEventListener("input", function () {
             if (emailInput.checkValidity()) {
@@ -97,6 +238,8 @@
         function showForm() {
             var email = document.getElementById("emailInput").value;
             var formContainer = document.getElementById("formContainer");
+            formContainer.innerHTML = "";
+            loadingIndicator.style.display = "block";
 
             var f = document.createElement("iframe");
             f.src =
@@ -106,9 +249,16 @@
             f.style.height = "858px";
             f.style.width = "100%";
 
-            formContainer.innerHTML = "";
+            f.onload = function () {
+                loadingIndicator.style.display = "none";
+            };
+
             formContainer.appendChild(f);
         }
+        jQuery(document).ready(function ($) {
+            // Replace 'popup-selector' with the actual CSS class or ID of your popup
+            $('#jet-popup-545').trigger('jet-popup-open');
+        });
     </script>
 </body>
 
