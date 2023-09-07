@@ -1,28 +1,25 @@
 <script>
     (function ($) {
-        if (window.location.search.indexOf('submitted=1') > -1) {
-            // This is the submission success page, we might not want to run our validations here
-            return;
-        }
-
-        // Add Required Mark class on Checkbox Label
-        $('.elementor-field-type-checkbox').addClass('elementor-mark-required');
 
         const form = $("#Contact_Phase2");
+        
+        if (form.length === 0) {
+            return;
+        }
+        
+        // Add Required Mark on Checkbox Label
+        $('.elementor-field-type-checkbox').addClass('elementor-mark-required');
 
         // Get all the checkbox inputs inside the specific field group
         const checkboxGroup = $(".elementor-field-group-field_553eb03");
         const checkboxes = checkboxGroup.find("input[type='checkbox']");
-
         const submitButton = $("#Contact_Phase2 button[type='submit']");
         const requiredFields = $("#Contact_Phase2 :required");
         const emailInput = $("#Contact_Phase2 input[type='email']");
         const moneyInput = $("#form-field-field_2dc5d14");
-
-        // Boolean variable to detect if submit button is clicked for the first time,
         let isSubmitAttempted = false;
 
-        // Add eror message for checkbox group
+        // Add checkboxes eror message
         errorMessageSpan = $("<span>", {
             class: "elementor-checkbox-error",
             text: "Please check at least one",
@@ -30,9 +27,19 @@
         });
         checkboxGroup.append(errorMessageSpan);
         const errorMessage = checkboxGroup.find(".elementor-checkbox-error");
-
         // Hide the error message by default
         errorMessage.hide();
+
+        // Function to enable or disable the submit button
+        function toggleSubmitButton() {
+            const allRequiredFieldsFilled = requiredFields.toArray().every(field => field.checkValidity());
+
+            if (allRequiredFieldsFilled && !checkboxes.is(":checked")) {
+                submitButton.prop('disabled', true);
+            } else {
+                submitButton.prop('disabled', false);
+            }
+        }
 
         // Function to check if at least one checkbox is checked
         function validateCheckboxes() {
@@ -49,12 +56,7 @@
 
         // Call the validation function on page load (in case of pre-filled form) and whenever checkboxes are clicked
         validateCheckboxes();
-
-        // callback functions ]every time a checkbox is changed
-        checkboxGroup.on("change", "input[type='checkbox']", function (event) {
-            validateCheckboxes();
-            updateNeedHelpWith();
-        });
+        checkboxGroup.on("change", "input[type='checkbox']", validateCheckboxes);
 
         // Function to validate the email field
         function validateEmail() {
@@ -65,7 +67,7 @@
             if (!isValidEmail) {
                 emailInput[0].setCustomValidity("Please enter a complete email address.");
             } else {
-                emailInput[0].setCustomValidity("");
+                emailInput[0].setCustomValidity(""); // Reset the error message if valid
             }
         }
         emailInput.on("input", validateEmail);
@@ -73,19 +75,23 @@
 
         // Attach submit handler to form
         submitButton.on("click", function (e) {
-            console.debug("button submit clicked but not submitted");
-
+            console.log("button submit triggered...");
             isSubmitAttempted = true;
             form[0].reportValidity();
             validateEmail();
             validateCheckboxes();
 
-            if (!form[0].checkValidity() || !validateCheckboxes()) {
+            if (!form[0].checkValidity()) {
                 e.preventDefault();
                 return;
             }
 
-            console.debug("form actually submitting...");
+            if (!checkboxes.is(":checked")) {
+                e.preventDefault();
+                return;
+            }
+
+            console.log("form actually submitting...");
 
         });
 
@@ -105,16 +111,6 @@
         moneyInput.on("input", function () {
             this.value = this.value.replace(/[^0-9.]/g, "");
         });
-
-        // Function to combine checked checkbox values into a string and set as input value
-        function updateNeedHelpWith() {
-            const checkedValues = checkboxes.filter(":checked").map(function () {
-                return this.value;
-            }).get().join(", ");
-
-            $("#form-field-field_4f70ce4").val(checkedValues);
-        }
-        updateNeedHelpWith(); // Call on page load if there are pre-filled values
 
     })(jQuery);
 
