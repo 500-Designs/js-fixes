@@ -15,9 +15,8 @@
   .hubspot-request-demo .hs-form {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(5, 1fr);
     grid-column-gap: 32px;
-    grid-row-gap: 16px;
+    grid-row-gap: 20px;
   }
 
   @media (max-width: 768px) {
@@ -28,31 +27,31 @@
   }
 
 
-  .hubspot-request-demo form :nth-child(1) {
+  .hubspot-request-demo form > :nth-child(1) {
     grid-area: 1 / 1 / 2 / 2;
   }
 
-  .hubspot-request-demo form :nth-child(2) {
+  .hubspot-request-demo form > :nth-child(2) {
     grid-area: 1 / 2 / 2 / 3;
   }
 
-  .hubspot-request-demo form :nth-child(3) {
+  .hubspot-request-demo form > :nth-child(3) {
     grid-area: 2 / 1 / 3 / 2;
   }
 
-  .hubspot-request-demo form :nth-child(4) {
+  .hubspot-request-demo form > :nth-child(4) {
     grid-area: 2 / 2 / 3 / 3;
   }
 
-  .hubspot-request-demo form :nth-child(5) {
+  .hubspot-request-demo form > :nth-child(5) {
     grid-area: 3 / 1 / 4 / 3;
   }
 
-  .hubspot-request-demo form :nth-child(6) {
+  .hubspot-request-demo form > :nth-child(6) {
     grid-area: 4 / 1 / 5 / 2;
   }
 
-  .hubspot-request-demo form :nth-child(7) {
+  .hubspot-request-demo form > :nth-child(7) {
     grid-area: 4 / 2 / 5 / 3;
   }
 
@@ -115,7 +114,6 @@
     font-style: normal;
     font-weight: 700;
     line-height: 26px;
-    /* 144.444% */
     letter-spacing: 3.6px;
     text-transform: uppercase;
     color: #FFF;
@@ -205,6 +203,11 @@
   .hubspot-request-demo .custom-checkbox {
     display: flex;
     gap: 10px;
+    margin-bottom: 50px;
+  }
+
+  .hubspot-request-demo .custom-checkbox a {
+    color: #000000;
   }
 
   .hubspot-request-demo label[for="privacy-policy-checkbox"] {
@@ -245,7 +248,7 @@
       `;
       const checkBox = checkBoxWrapper.querySelector("#privacy-policy-checkbox");
 
-      $form.find('.hs-submit').before(checkBoxWrapper);
+      $form.find('input[type="submit"]').before(checkBoxWrapper);
 
       // Function to check if all input fields are filled
       function areAllInputsFilled() {
