@@ -35,7 +35,7 @@
   .hubspot-request-demo form :nth-child(5) { grid-area: 3 / 1 / 4 / 3; }
   .hubspot-request-demo form :nth-child(6) { grid-area: 4 / 1 / 5 / 2; }
   .hubspot-request-demo form :nth-child(7) { grid-area: 4 / 2 / 5 / 3; }
-  .hubspot-request-demo form :nth-child(8) { grid-area: 5 / 1 / 6 / 3; }
+  .hubspot-request-demo form .hs_submit  { grid-area: 5 / 1 / 6 / 3; }
 
   .hubspot-request-demo .hs-input {
     display: flex;
@@ -176,7 +176,18 @@
     outline: none;
     text-decoration: none;
 	}
-
+  
+  .hubspot-request-demo .custom-checkbox {
+    display: flex;
+    gap: 10px;
+  }
+  .hubspot-request-demo label[for="privacy-policy-checkbox"] {
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    color: #000000;
+    margin: 0;
+  }
 
 </style>
 
@@ -187,35 +198,79 @@
     portalId: "8567706",
     formId: "5ab4b6e8-e986-401b-b3bb-78c20a26ba6c",
     locale: 'en',
-      translations: {
-        en: {
-           required: "This field is required."
-        }
-      },
+    translations: {
+      en: {
+        required: "This field is required."
+      }
+    },
     onFormReady: function($form) {
-    	 	const form = document.querySelector(".hubspot-request-demo .hs-form");
-        const inputs = form.querySelectorAll(".hubspot-request-demo .hs-input");
-        const submitButton = form.querySelector(".hubspot-request-demo .hs-button");
+      // Previous code for finding form and inputs
+      const form = document.querySelector(".hubspot-request-demo .hs-form");
+      const inputs = form.querySelectorAll(".hubspot-request-demo .hs-input");
+      const submitButton = form.querySelector(".hubspot-request-demo .hs-button");
 
-        // Function to check if all input fields are filled
-        function areAllInputsFilled() {
-          for (const input of inputs) {
-            if (input.value.trim() === "") {
-              return false; // At least one input is empty
-            }
-          }
-          return true; // All inputs are filled
+      const fieldsRenderCheckInterval = setInterval(function() {
+        const stateDiv = form.querySelector(".hs_state");
+    
+        if (stateDiv) {
+          clearInterval(fieldsRenderCheckInterval);
+    
+          const newCheckboxWrapper = document.createElement("div");
+          newCheckboxWrapper.className = "custom-checkbox"; 
+          const newCheckbox = document.createElement("input");
+          const newLabel = document.createElement("label");
+    
+          newCheckbox.type = "checkbox";
+          newCheckbox.id = "privacy-policy-checkbox";
+          newCheckbox.required = true;
+    
+          newLabel.htmlFor = "privacy-policy-checkbox";
+    
+          const privacyPolicyLink = document.createElement("a");
+          privacyPolicyLink.href = "/resources/privacy-policy";
+          privacyPolicyLink.target = "_blank";
+          privacyPolicyLink.innerHTML = "Privacy Policy";
+    
+          newLabel.innerHTML = 'I agree to BarTrack\'s ';
+          newLabel.appendChild(privacyPolicyLink);
+    
+          newCheckboxWrapper.appendChild(newCheckbox);
+          newCheckboxWrapper.appendChild(newLabel);
+    
+          stateDiv.parentNode.insertBefore(newCheckboxWrapper, stateDiv.nextSibling);
         }
+      }, 100);
 
-        // Initial check and setting the disabled state
-        submitButton.disabled = !areAllInputsFilled();
-
-        // Adding input event listeners to check and update disabled state
+      // Function to check if all input fields are filled
+      function areAllInputsFilled() {
         for (const input of inputs) {
-          input.addEventListener("input", function () {
-            submitButton.disabled = !areAllInputsFilled();
-          });
+          if (input.value.trim() === "") {
+            return false; // At least one input is empty
+          }
         }
+
+        // Check if the privacy policy checkbox is checked
+        if (!newCheckbox.checked) {
+          return false;
+        }
+
+        return true; // All inputs are filled and checkbox is checked
+      }
+
+      // Initial check and setting the disabled state
+      submitButton.disabled = !areAllInputsFilled();
+
+      // Adding input event listeners to check and update disabled state
+      for (const input of inputs) {
+        input.addEventListener("input", function () {
+          submitButton.disabled = !areAllInputsFilled();
+        });
+      }
+
+      // Adding click event listener to the new checkbox
+      newCheckbox.addEventListener("click", function () {
+        submitButton.disabled = !areAllInputsFilled();
+      });
     }
   });
 </script>
