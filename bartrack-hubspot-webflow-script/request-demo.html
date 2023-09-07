@@ -1,9 +1,9 @@
 <style>
-  .hs-richtext {
+  .hubspot-request-demo .hs-richtext {
     display: none;
   }
 
-  label {
+  .hubspot-request-demo label {
     font-family: Montserrat;
     font-size: 18px;
     font-style: normal;
@@ -12,47 +12,32 @@
     color: #404040;
   }
 
-  .hs-form {
+  .hubspot-request-demo .hs-form {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(5, 1fr);
     grid-column-gap: 32px;
     grid-row-gap: 16px;
   }
-
+  
   @media (max-width: 768px) {
-    .hs-form {
+    .hubspot-request-demo .hs-form {
       display: flex;
       flex-direction: column;
     }
-  }
+	}
 
-  form :nth-child(1) {
-    grid-area: 1 / 1 / 2 / 2;
-  }
-  form :nth-child(2) {
-    grid-area: 1 / 2 / 2 / 3;
-  }
-  form :nth-child(3) {
-    grid-area: 2 / 1 / 3 / 2;
-  }
-  form :nth-child(4) {
-    grid-area: 2 / 2 / 3 / 3;
-  }
-  form :nth-child(5) {
-    grid-area: 3 / 1 / 4 / 3;
-  }
-  form :nth-child(6) {
-    grid-area: 4 / 1 / 5 / 2;
-  }
-  form :nth-child(7) {
-    grid-area: 4 / 2 / 5 / 3;
-  }
-  form :nth-child(8) {
-    grid-area: 5 / 1 / 6 / 3;
-  }
+  
+  .hubspot-request-demo form :nth-child(1) { grid-area: 1 / 1 / 2 / 2; }
+  .hubspot-request-demo form :nth-child(2) { grid-area: 1 / 2 / 2 / 3; }
+  .hubspot-request-demo form :nth-child(3) { grid-area: 2 / 1 / 3 / 2; }
+  .hubspot-request-demo form :nth-child(4) { grid-area: 2 / 2 / 3 / 3; }
+  .hubspot-request-demo form :nth-child(5) { grid-area: 3 / 1 / 4 / 3; }
+  .hubspot-request-demo form :nth-child(6) { grid-area: 4 / 1 / 5 / 2; }
+  .hubspot-request-demo form :nth-child(7) { grid-area: 4 / 2 / 5 / 3; }
+  .hubspot-request-demo form :nth-child(8) { grid-area: 5 / 1 / 6 / 3; }
 
-  .hs-input {
+  .hubspot-request-demo .hs-input {
     display: flex;
     width: 100%;
     min-height: 59px;
@@ -60,8 +45,8 @@
     align-items: center;
     align-self: stretch;
     border-radius: 8px;
-    background-color: #f5f5f5;
-    border: 2px solid #f5f5f5;
+    background-color: #F5F5F5;
+    border: 2px solid #F5F5F5;
     outline: none;
     font-family: Montserrat;
     font-size: 16px;
@@ -70,31 +55,31 @@
     line-height: 24px;
     color: #000;
   }
-
-  .hs-input:placeholder {
-    color: #929292;
+  
+  .hubspot-request-demo .hs-input:placeholder {
+  	color: #929292;
   }
-
-  .hs-input:hover {
-    background: #e1e1e1;
-    border: 2px solid #e1e1e1;
+  
+  .hubspot-request-demo .hs-input:hover {
+  	background: #E1E1E1;
+    border: 2px solid #E1E1E1;
   }
-
-  .hs-input:focus {
-    background: linear-gradient(white, white) padding-box,
-      linear-gradient(to right, #fedd00, #ff5c39) border-box;
+  
+  .hubspot-request-demo .hs-input:focus {
+  	background: linear-gradient(white, white) padding-box,
+              linear-gradient(to right, #FEDD00,  #ff5c39) border-box;
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
     border: 2px solid transparent;
   }
-
-  .invalid {
-    border: 2px solid #a70000;
-    background: #ffe9e9;
+  
+  .hubspot-request-demo .invalid {
+  	border: 2px solid #A70000;
+    background: #FFE9E9;
   }
 
-  .hs-button {
-    margin-top: 64px;
+  .hubspot-request-demo .hs-button {
+  	margin-top: 64px;
     width: 100%;
     display: flex;
     padding: 16px;
@@ -110,65 +95,67 @@
     line-height: 26px; /* 144.444% */
     letter-spacing: 3.6px;
     text-transform: uppercase;
-    color: #fff;
+    color: #FFF;
     border: none;
     outline: none;
+    cursor: pointer;
   }
-
-  .hs-button:disabled {
-    background-color: #929292;
+  
+  .hubspot-request-demo .hs-button:disabled {
+  	background-color: #929292;
+    cursor: not-allowed;
   }
-
-  ul.hs-error-msgs {
-    margin-top: 4px;
-    margin-left: -24px;
+  
+  .hubspot-request-demo ul.hs-error-msgs {
+  	margin-top: 4px;
+		margin-left: -24px;
     list-style-type: none;
   }
-
-  .hs-error-msg {
-    background: url("https://uploads-ssl.webflow.com/647ee2d7d7283da775036ae2/64f08ad5db9edff387bec709_error.svg");
+ 
+  .hubspot-request-demo .hs-error-msg {
+  	background: url('https://uploads-ssl.webflow.com/647ee2d7d7283da775036ae2/64f08ad5db9edff387bec709_error.svg');
     background-repeat: no-repeat;
     background-position: left center;
     padding-left: 32px;
-    color: #a70000;
+  	color: #A70000;
     font-family: Montserrat;
     font-size: 18px;
     font-style: normal;
     font-weight: 400;
     line-height: 32px;
   }
-
-  .submitted-message {
+  
+  .hubspot-request-demo .submitted-message {
     justify-content: center;
     text-align: center;
   }
-
-  div.submitted-message p:nth-child(2) {
-    margin-top: 30px;
-    color: #000;
-    font-family: "Nubernext Bold", sans-serif;
+  
+  .hubspot-request-demo div.submitted-message p:nth-child(2) {
+  	margin-top: 30px;
+  	color: #000;
+  	font-family: "Nubernext Bold", sans-serif;
     font-size: 56px;
     font-style: normal;
     font-weight: 700;
     line-height: 60px; /* 107.143% */
     letter-spacing: -1px;
     text-align: center;
-  }
-
-  div.submitted-message p:nth-child(3) {
-    margin-top: 16px;
-    color: #000;
-    text-align: center;
+	}
+  
+  .hubspot-request-demo div.submitted-message p:nth-child(3) {
+  	margin-top: 16px;
+  	color: #000;
+		text-align:center;
     font-family: Montserrat;
     font-size: 20px;
     font-style: normal;
     font-weight: 400;
     line-height: 32px;
     letter-spacing: -0.2px;
-  }
-
-  div.submitted-message p:nth-child(4) a {
-    margin-top: 64px;
+	}
+  
+  .hubspot-request-demo div.submitted-message p:nth-child(4) a {
+  	margin-top: 64px;
     width: 100%;
     display: flex;
     padding: 16px;
@@ -184,28 +171,51 @@
     line-height: 26px; /* 144.444% */
     letter-spacing: 3.6px;
     text-transform: uppercase;
-    color: #fff;
+    color: #FFF;
     border: none;
     outline: none;
     text-decoration: none;
-  }
+	}
+
+
 </style>
 
-<script
-  charset="utf-8"
-  type="text/javascript"
-  src="//js.hsforms.net/forms/embed/v2.js"
-></script>
+<script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
 <script>
   hbspt.forms.create({
     region: "na1",
     portalId: "8567706",
     formId: "5ab4b6e8-e986-401b-b3bb-78c20a26ba6c",
-    locale: "en",
-    translations: {
-      en: {
-        required: "This field is required.",
+    locale: 'en',
+      translations: {
+        en: {
+           required: "This field is required."
+        }
       },
-    },
+    onFormReady: function($form) {
+    	 	const form = document.querySelector(".hubspot-request-demo .hs-form");
+        const inputs = form.querySelectorAll(".hubspot-request-demo .hs-input");
+        const submitButton = form.querySelector(".hubspot-request-demo .hs-button");
+
+        // Function to check if all input fields are filled
+        function areAllInputsFilled() {
+          for (const input of inputs) {
+            if (input.value.trim() === "") {
+              return false; // At least one input is empty
+            }
+          }
+          return true; // All inputs are filled
+        }
+
+        // Initial check and setting the disabled state
+        submitButton.disabled = !areAllInputsFilled();
+
+        // Adding input event listeners to check and update disabled state
+        for (const input of inputs) {
+          input.addEventListener("input", function () {
+            submitButton.disabled = !areAllInputsFilled();
+          });
+        }
+    }
   });
 </script>
