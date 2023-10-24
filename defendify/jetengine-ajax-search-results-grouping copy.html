@@ -71,7 +71,8 @@
                 observer.disconnect();
             }
             identifierElement = document.querySelector(SELECTOR);
-            const resultsItems = Array.from(identifierElement.children).filter(child => child.classList.contains('jet-listing-grid__item'));
+            let resultsItems;
+            resultsItems = Array.from(identifierElement.children).filter(child => child.classList.contains('jet-listing-grid__item'));
 
             let headingsFound = 0;
 
@@ -109,9 +110,10 @@
             if (observedElement) {
                 const callback = function (mutationsList, observerInstance) {
                     for (let mutation of mutationsList) {
+                        console.log("observedElement mutated" + mutation.type);
                         setTimeout(() => {
-                            processData();
-                        }, 2000);
+                            pollForElement(`${SELECTOR} .jet-listing-grid__item .elementor-heading-title`, processData);
+                        }, 100);
                     }
                 };
                 observer = new MutationObserver(callback);
@@ -123,6 +125,28 @@
         } else {
             console.warn('identifierElement NOT found.');
         }
+
+        function pollForElement(selector, callback, interval = 100, timeout = 5000) {
+            let startTime = Date.now();
+            let attempts = 0;
+        
+            console.log("Polling started for element:", selector);
+        
+            let poller = setInterval(function() {
+                attempts++;
+                if (document.querySelector(selector)) {
+                    clearInterval(poller);
+                    console.log(`Element found after ${attempts} attempts.`);
+                    callback();
+                } else if (Date.now() - startTime > timeout) {
+                    clearInterval(poller);
+                    console.warn(`Element not found after ${attempts} attempts within the timeout period.`);
+                } else {
+                    console.log(`Attempt ${attempts}: Element not found.`);
+                }
+            }, interval);
+        }
+        
 
     });
 

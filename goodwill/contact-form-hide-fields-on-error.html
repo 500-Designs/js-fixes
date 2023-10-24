@@ -1,30 +1,37 @@
 <script>
     jQuery(document).ready(($) => {
 
-        var $formFields = $('.gw-contact-form .elementor-form-fields-wrapper');
+    // START: Mod for all NON pop-up forms
 
-        // hide form when SUCCESS
-        $(document).on('submit_success', '.gw-contact-form', (e) => {
-            console.debug("form submission successful");
-            $formFields.hide();
-        });
+        const elementorForm = document.querySelector('.elementor-form');
 
-        // hide form when ERROR
-        function checkIfErrorExists() {
-            var $formErrorScreen = $('.gw-contact-form .elementor-message-danger');
+        const fieldsWrapper = "elementor-form-fields-wrapper";
+        const errorClassName = "elementor-message-danger";
+        const successClassName = "elementor-message-success";
 
-            if ($formErrorScreen.length > 0) {
-                console.log("form error message loaded...");
-                initErrorMods();
+        
+        // Define the callback function
+        function mutationCallback(mutationsList, observer) {
+            for (let mutation of mutationsList) {
+                if (mutation.type === 'childList') {
+                    $(mutation.addedNodes).each(function() {
+                        if ($(this).hasClass('elementor-message-danger')) {
+                            $('.elementor-form .elementor-form-fields-wrapper').hide();
+                            initErrorMods();
+                        }
+                    });
+                }
             }
         }
 
-        var observer = new MutationObserver(function (mutations) {
-            checkIfErrorExists();
-        });
+        var observer = new MutationObserver(mutationCallback);
 
+        // Start observing the target node with the configured parameters
+        observer.observe(elementorForm, { childList: true });
+    
         // show form when TRY AGAIN
         function initErrorMods() {
+            var $formFields = $('.elementor-form .elementor-form-fields-wrapper');
             var $tryAgainBUtton = $('.gw-contact-form a[href="javascript:location.reload()"][aria-label="try again message button"]');
             var $formErrorScreen = $('.gw-contact-form .elementor-message-danger');
             $formErrorScreen.show();
@@ -36,23 +43,25 @@
             });
         }
 
+                
+    // END: Mod for all NON pop-up forms
 
     // START: Mod for Accidental donation form pop-up on page /donate-goods
 
         function hideFormFields(formSelector) {
             var $form = $(formSelector);
-        
+
             // Make parent elements expand to fit the form content
             $form.parentsUntil('.dialog-lightbox-widget-content').height('auto');
-        
+
             // Hide all children except for elements with class 'elementor-message'
             $form.children().not('.elementor-message').hide();
-        
+
             // Hide siblings of the parent element of the form
             $form.parent().parent().siblings().hide();
-          }
+        }
 
-        // detect when the form is intialized from pop-up
+        // dectect when the error message is intialized
         $(document).on('elementor/popup/show', function () {
             console.log("pop-up shown...!");
 
