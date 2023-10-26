@@ -50,6 +50,32 @@ $(document).ready(function() {
     // Handle form submission
     $(document).on('submit', formID, handleFormSubmission);
 
+    // Disable submit button by default
+    $(formID + ' .field-type-submit button').attr('disabled', true).addClass('submit-disabled');
+
+    // Disbale submission on enter key press
+    $(formID).on('keydown', function(event) {
+        if (event.which === 13) { 
+            event.preventDefault();
+            return false;
+        }
+    });
+
+    // Check input fields for validity and enable/disable submit button
+    $(formID + ' .email-field #email, ' + formID + ' #firstname, ' + formID + ' #lastname').on('input', function() {
+        // Validate fields
+        var emailValid = isValidEmail($(formID + ' .email-field #email').val());
+        var firstnameValid = onlyLettersAndSpaces($(formID + ' #firstname').val());
+        var lastnameValid = onlyLettersAndSpaces($(formID + ' #lastname').val());
+
+        // Enable or disable submit button based on validation
+        if (emailValid && firstnameValid && lastnameValid) {
+            $(formID + ' .field-type-submit button').removeAttr('disabled').removeClass('submit-disabled');
+        } else {
+            $(formID + ' .field-type-submit button').attr('disabled', true).addClass('submit-disabled');
+        }
+    });
+
     // Check if string contains only letters, spaces, hyphens or apostrophes
     function onlyLettersAndSpaces(str) {
         return /^[a-zA-Z]+[- ']{0,1}[a-zA-Z]+$/.test(str);
@@ -57,7 +83,7 @@ $(document).ready(function() {
 
     // Check if given email format is valid
     function isValidEmail(email) {
-        var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+        var emailReg = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,10}$/;
         return emailReg.test(email);
     }
 
@@ -99,6 +125,7 @@ $(document).ready(function() {
 
         emailInput.siblings('.notif, .notif-success').remove();
         emailInput.parent().append('<span class="notif">Please wait as we check your email for verification...</span>');
+        $(formID + ' .jet-form-row--submit').hide();
 
         if (!isValidEmail(email)) {
             emailInput.siblings('.notif').remove();
@@ -110,17 +137,19 @@ $(document).ready(function() {
 
     // Handle successful email scan
     function handleScanSuccess(data) {
+        console.log("SUCCESS DATA: ", data)
         $(formID + ' .field-type-submit').attr('scan-result', data);
 
         $(formID + ' .email-field .notif').remove();
-        $(formID + ' .email-field').append(notifSuccess('Email verified.'));
+        // $(formID + ' .email-field').append(notifSuccess('Email verified.'));
         $(formID + ' .field-type-submit button').removeAttr('disabled').removeClass('submit-disabled');
 
         setTimeout(function() {
             $(formID + ' .email-field .notif-success').remove();
             $(formID + ' .submit-type-reload').show();
             $(formID + ' .verify-email').hide();
-        }, 2000);
+            $(formID + ' button.jet-form__submit').trigger("click");
+        }, 1000);
     }
 
     // Handle failed email scan
