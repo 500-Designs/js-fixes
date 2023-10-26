@@ -1,167 +1,203 @@
 <script>
-(function($){
-$(document).ready(function() {
-    console.log('Hubspot Form integration: Free Compromised Password Scan');
-
-    var formSelector = '.free-compromised-password-form .jet-form';
-    $(formSelector).attr('id', 'wp-free-compromised-password-form');
-    $('#wp-free-compromised-password-form .field-type-submit .submit-type-reload').hide();
-    $('#wp-free-compromised-password-form .field-type-submit .jet-form__submit-wrap').append('<button class="verify-email">Verify Email</button>');
-
-    var base_url = window.location.origin;
-    var ajaxscript = base_url + "/wp-admin/admin-ajax.php";
+    (function($){
+    $(document).ready(function() {
+        // Console log for debugging purposes
+        console.log('Hubspot Form integration: Free Compromised Password Scan');
     
-    $.ajax({
-        url: ajaxscript,
-        data: {
-            "action": "defendify_form_validations_ajax_controller",
-            "option-page": "form-validations",
-            "form": "contact-us-form"
-        },
-        success: function(data) {
-            var messages = JSON.parse(data);
-            $.each(messages, function(field, message) {
-                $('#wp-free-compromised-password-form .' + field).attr('validation-message', message);
+        // Define common form selector
+        var formSelector = '.free-compromised-password-form .jet-form';
+        var formID = '#wp-free-compromised-password-form';
+        
+        // Set unique ID to the form
+        $(formSelector).attr('id', 'wp-free-compromised-password-form');
+        
+        // Modify submit button and add new verify email button
+        $(formID + ' .field-type-submit .submit-type-reload').hide();
+        $(formID + ' .field-type-submit .jet-form__submit-wrap').append('<button class="verify-email">Verify Email</button>');
+    
+        // Define common URLs
+        var base_url = window.location.origin;
+        var ajaxscript = base_url + "/wp-admin/admin-ajax.php";
+    
+        // Fetch form validation messages from the server
+        $.ajax({
+            url: ajaxscript,
+            data: {
+                "action": "defendify_form_validations_ajax_controller",
+                "option-page": "form-validations",
+                "form": "contact-us-form"
+            },
+            success: function(data) {
+                var messages = JSON.parse(data);
+                $.each(messages, function(field, message) {
+                    $(formID + ' .' + field).attr('validation-message', message);
+                });
+            }
+        });
+    
+        // Verify email when button is clicked
+        $(document).on('click', formID + ' .verify-email', function(event) {
+            event.preventDefault();
+            verifyEmail();
+        });
+    
+        // Change button appearance based on email input
+        $(formID + ' .email-field #email').on('input', function() {
+            $(formID + ' .submit-type-reload').hide();
+            $(formID + ' .verify-email').show();
+        });
+    
+        // Handle form submission
+        $(document).on('submit', formID, handleFormSubmission);
+    
+        // Check if string contains only letters, spaces, hyphens or apostrophes
+        function onlyLettersAndSpaces(str) {
+            return /^[a-zA-Z]+[- ']{0,1}[a-zA-Z]+$/.test(str);
+        }
+    
+        // Check if given email format is valid
+        function isValidEmail(email) {
+            var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+            return emailReg.test(email);
+        }
+    
+        // Generate success notification HTML
+        function notifSuccess(str) {
+            return "<div class='notif-success'><img class='icon' src='" + base_url + "/wp-content/uploads/2022/09/Icon.svg' width='56' height='56'><span class='message'>" + str + "</span></div>";
+        }
+    
+        // Generate error notification HTML
+        function notifError(str) {
+            return '<span class="notif-error">' + str + '</span>';
+        }
+    
+        // Perform an API call to scan email
+        function scan_api_call() {
+            var email = $(formID + ' #email').val();
+            
+            $(formID + ' .field-type-submit button').attr('disabled', true).addClass('submit-disabled');
+    
+            $.ajax({
+                url: ajaxscript,
+                data: {
+                    "action": "defendify_website_scan_ajax_controller",
+                    "email": email,
+                },
+                success: function(data) {
+                    handleScanSuccess(data);
+                },
+                error: function() {
+                    handleScanError();
+                }
             });
         }
-    });
-
-    $(document).on('click', '#wp-free-compromised-password-form .verify-email', function(event) {
-        var emailInput = $('#wp-free-compromised-password-form .email-field input');
-        var email = emailInput.val();
-        
-        event.preventDefault();
-        
-        emailInput.siblings('.notif, .notif-success').remove();
-        emailInput.parent().append('<span class="notif">Please wait as we check your email for verification...</span>');
-
-        if (!isValidEmail(email)) {
-            emailInput.siblings('.notif').remove();
-            emailInput.parent().append(notifError(emailInput.parent().attr('validation-message')));
-        } else {
-            scan_api_call();
+    
+        // Verify email function
+        function verifyEmail() {
+            var emailInput = $(formID + ' .email-field input');
+            var email = emailInput.val();
+    
+            emailInput.siblings('.notif, .notif-success').remove();
+            emailInput.parent().append('<span class="notif">Please wait as we check your email for verification...</span>');
+    
+            if (!isValidEmail(email)) {
+                emailInput.siblings('.notif').remove();
+                emailInput.parent().append(notifError(emailInput.parent().attr('validation-message')));
+            } else {
+                scan_api_call();
+            }
         }
-    });
-
-    $('#wp-free-compromised-password-form .email-field #email').on('input', function() {
-        $('#wp-free-compromised-password-form .submit-type-reload').hide();
-        $('#wp-free-compromised-password-form .verify-email').show();
-    });
-
-    $(document).on('submit', '#wp-free-compromised-password-form', function(event) {
-        event.preventDefault();
-        var form = $(this);
-
-        form.find('.notif-success, .notif-error').hide();
-        form.find('.jet-form__submit').prop("disabled", false).css('visibility', 'hidden');
-        
-        setTimeout(function() {
-            $('.form_loader').css('display', 'block');
-        }, 1000);
-
-        var validations = checkValidationMessages();
-        
-        if (!validations.status) {
+    
+        // Handle successful email scan
+        function handleScanSuccess(data) {
+            $(formID + ' .field-type-submit').attr('scan-result', data);
+    
+            $(formID + ' .email-field .notif').remove();
+            $(formID + ' .email-field').append(notifSuccess('Email verified.'));
+            $(formID + ' .field-type-submit button').removeAttr('disabled').removeClass('submit-disabled');
+    
+            setTimeout(function() {
+                $(formID + ' .email-field .notif-success').remove();
+                $(formID + ' .submit-type-reload').show();
+                $(formID + ' .verify-email').hide();
+            }, 2000);
+        }
+    
+        // Handle failed email scan
+        function handleScanError() {
+            $(formID + ' .email-field .notif').remove();
+            $(formID + ' .email-field').append(notifError('Email verification failed. Please try again later.'));
+        }
+    
+        // Validate and handle form submission
+        function handleFormSubmission(event) {
+            event.preventDefault();
+    
+            // Validate form inputs
+            var validations = checkValidationMessages();
+            
+            // Handle validation errors
+            if (!validations.status) {
+                processValidationErrors(validations);
+                return false;
+            } else {
+                // Process successful form submission
+                elementorProFrontend.modules.popup.showPopup({ id: 1278 });
+                var redirect_url = $(formID + ' .field-type-submit').attr('scan-result');
+                window.location.replace(redirect_url);
+                return true;
+            }
+        }
+    
+        // Check validation messages for each input field
+        function checkValidationMessages() {
+            var validation = { status: true };
+    
+            var email = $(formID + ' #email').val();
+            if (!isValidEmail(email)) {
+                validation['status'] = false;
+                validation['email'] = false;
+                validation['email-message'] = $(formID + ' .email-field').attr('validation-message');
+            }
+    
+            var firstname = $(formID + ' #firstname').val();
+            if (!onlyLettersAndSpaces(firstname)) {
+                validation['status'] = false;
+                validation['firstname'] = false;
+                validation['firstname-message'] = $(formID + ' .firstname-field').attr('validation-message');
+            }
+    
+            var lastname = $(formID + ' #lastname').val();
+            if (!onlyLettersAndSpaces(lastname)) {
+                validation['status'] = false;
+                validation['lastname'] = false;
+                validation['lastname-message'] = $(formID + ' .lastname-field').attr('validation-message');
+            }
+    
+            if (!validation['status']) {
+                validation['status-message'] = $(formID + ' .field-type-submit').attr('validation-message');
+            }
+    
+            return validation;
+        }
+    
+        // Display validation errors
+        function processValidationErrors(validations) {
+            var form = $(formID);
+    
+            form.find('.notif-success, .notif-error').hide();
+            form.find('.jet-form__submit').prop("disabled", false).css('visibility', 'visible');
+            $('.form_loader').css('display', 'none');
+            
             $.each(validations, function(field, valid) {
                 if (!valid && field !== 'status') {
                     form.find('.' + field).append(notifError(validations[field + '-message']));
                 }
             });
-            
+                
             form.append(notifError(validations['status-message']));
-            form.find('.jet-form__submit').prop("disabled", false).css('visibility', 'visible');
-            $('.form_loader').css('display', 'none');
-            
-            return false;
-        } else {
-            elementorProFrontend.modules.popup.showPopup({ id: 1278 });
-            var redirect_url = form.find('.field-type-submit').attr('scan-result');
-            window.location.replace(redirect_url);
-            return true;
         }
     });
-
-    function checkValidationMessages() {
-        var form = "#wp-free-compromised-password-form";
-        var validation = { status: true };
-
-        var email = $(form + ' #email').val();
-        if (!isValidEmail(email)) {
-            validation['status'] = false;
-            validation['email'] = false;
-            validation['email-message'] = $(form + ' .email-field').attr('validation-message');
-        }
-
-        var firstname = $(form + ' #firstname').val();
-        if (!onlyLettersAndSpaces(firstname)) {
-            validation['status'] = false;
-            validation['firstname'] = false;
-            validation['firstname-message'] = $(form + ' .firstname-field').attr('validation-message');
-        }
-
-        var lastname = $(form + ' #lastname').val();
-        if (!onlyLettersAndSpaces(lastname)) {
-            validation['status'] = false;
-            validation['lastname'] = false;
-            validation['lastname-message'] = $(form + ' .lastname-field').attr('validation-message');
-        }
-
-        if (!validation['status']) {
-            validation['status-message'] = $(form + ' .field-type-submit').attr('validation-message');
-        }
-
-        return validation;
-    }
-
-    function onlyLettersAndSpaces(str) {
-        return /^[a-zA-Z]+[- ']{0,1}[a-zA-Z]+$/.test(str);
-    }
-
-    function isValidEmail(email) {
-        var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
-        return emailReg.test(email);
-    }
-
-    function notifSuccess(str) {
-        var base_url = window.location.origin;
-        return "<div class='notif-success'><img class='icon' src='" + base_url + "/wp-content/uploads/2022/09/Icon.svg' width='56' height='56'><span class='message'>" + str + "</span></div>";
-    }
-
-    function notifError(str) {
-        return '<span class="notif-error">' + str + '</span>';
-    }
-
-    function scan_api_call() {
-        var form = '#wp-free-compromised-password-form';
-        var email = $(form + ' #email').val();
-        
-        $(form + ' .field-type-submit button').attr('disabled', true).addClass('submit-disabled');
-
-        $.ajax({
-            url: ajaxscript,
-            data: {
-                "action": "defendify_website_scan_ajax_controller",
-                "email": email,
-            },
-            success: function(data) {
-                $(form + ' .field-type-submit').attr('scan-result', data);
-
-                $(form + ' .email-field .notif').remove();
-                $(form + ' .email-field').append('<span class="notif-success">Email verified.</span>');
-                $(form + ' .field-type-submit button').removeAttr('disabled').removeClass('submit-disabled');
-
-                setTimeout(function() {
-                    $(form + ' .email-field .notif-success').remove();
-                    $('#wp-free-compromised-password-form .submit-type-reload').show();
-                    $('#wp-free-compromised-password-form .verify-email').hide();
-                }, 2000);
-            },
-            error: function() {
-                $(form + ' .email-field .notif').remove();
-                $(form + ' .email-field').append('<span class="notif-error">Email verification failed. Please try again later.</span>');
-            }
-        });
-    }
-});
-})(jQuery);
-</script>
+    })(jQuery);
+    </script>
+    
