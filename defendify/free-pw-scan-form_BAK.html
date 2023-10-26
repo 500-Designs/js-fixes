@@ -1,0 +1,306 @@
+<script>
+	console.log('Hubspot Form integration: Free Compromised Password Scan');
+
+	/*
+	** Add an ID on the form
+	** For Hubspot integration */
+	jQuery('.free-compromised-password-form .jet-form').attr('id', 'wp-free-compromised-password-form');
+	jQuery('#wp-free-compromised-password-form .field-type-submit .submit-type-reload').hide();
+  	jQuery('#wp-free-compromised-password-form .field-type-submit .jet-form__submit-wrap').append('<button class="verify-email">Verify Email</button>');
+
+	/* 
+	** Fetch validation messages */
+	var base_url = window.location.origin;
+	var ajaxscript = base_url+"/wp-admin/admin-ajax.php"; 
+	jQuery.ajax({
+    	url: ajaxscript,
+	    data: {
+	        "action": "defendify_form_validations_ajax_controller",
+	        "option-page": "form-validations",
+	        "form": "contact-us-form"
+	    },
+	    success: function(data){
+	    	
+			var messages = JSON.parse(data);
+			var form = '#wp-free-compromised-password-form'; 
+
+			jQuery(form+' .firstname-field').attr('validation-message',messages.firstname_field);
+			jQuery(form+' .lastname-field').attr('validation-message',messages.lastname_field);
+			jQuery(form+' .email-field').attr('validation-message',messages.email_field);
+			jQuery(form+' .field-type-submit').attr('validation-message',messages.submit_failed);
+
+		}
+	});
+
+	jQuery(document).on('click','#wp-free-compromised-password-form .field-type-submit .jet-form__submit-wrap .verify-email',function(event){
+
+		var form = '#wp-free-compromised-password-form'; 
+		var email = jQuery(form+' .email-field input').val();
+		var validations = free_compromised_password_scan_form_check_validation_messages();
+		event.preventDefault();
+
+		jQuery(form+' .jet-form-col.email-field .notif').remove();
+		jQuery(form+' .jet-form-col.email-field .notif-success').remove();
+
+		jQuery(form+' .jet-form-col.email-field').append('<span class="notif">Please wait as we check your email for verification...</span>');
+
+		/* Email */
+		var email = jQuery(form+' .jet-form-row #email').val();
+		var email_validation = true;
+			
+		if(validateEmail(email) === false){ email_validation = false; }
+			
+		var email = email.split('@'); email_before_at = email[0];
+		if(onlyNumbers(email_before_at) === true){ email_validation = false; }
+			
+		email = email[1].split('.'); var email_before_dot = email[0];
+		if(onlyNumbers(email_before_dot) === true){ email_validation = false; }
+			
+		var email_after_dot = email[1];
+		if(onlyNumbers(email_after_dot) === true){ email_validation = false; }
+
+		if(email_validation === true){
+			scan_api_call();
+		}
+
+		if(email_validation === false){
+			jQuery(form+' .jet-form-col.email-field .notif').remove();
+			jQuery(form+' .jet-form-col.email-field .notif-error').remove();
+			jQuery(form+' .jet-form-col.email-field').append(notifError(validations['email-message']));
+		}
+
+	});
+
+	jQuery('#wp-free-compromised-password-form .email-field #email').on('input', function(){
+		jQuery('#wp-free-compromised-password-form .field-type-submit .submit-type-reload').hide();
+  		jQuery('#wp-free-compromised-password-form .field-type-submit .jet-form__submit-wrap .verify-email').show();
+	});
+
+
+// 	jQuery(document).on('keyup','#wp-free-compromised-password-form .email-field input',function(event){
+
+// 		var form = '#wp-free-compromised-password-form'; 
+// 		var email = jQuery(form+' .email-field input').val();
+
+// 		if(validateEmail(email) === true){
+// 			scan_api_call();
+// 		}
+
+// 	});
+// 	console.log('hello8');
+// 	jQuery('#wp-free-compromised-password-form .email-field #email').on('input', function(){
+// 		var form = '#wp-free-compromised-password-form'; 
+// 		var email = jQuery(form+' .email-field input').val();
+
+
+// 		jQuery(form+' .jet-form-col.email-field .notif').remove();
+// 		jQuery(form+' .jet-form-col.email-field .notif-success').remove();
+
+// 		/* Email */
+// 		var email = jQuery(form+' .jet-form-row #email').val();
+// 		var email_validation = true;
+			
+// 		if(validateEmail(email) === false){ email_validation = false; }
+			
+// 		var email = email.split('@'); email_before_at = email[0];
+// 		if(onlyNumbers(email_before_at) === true){ email_validation = false; }
+			
+// 		email = email[1].split('.'); var email_before_dot = email[0];
+// 		if(onlyNumbers(email_before_dot) === true){ email_validation = false; }
+			
+// 		var email_after_dot = email[1];
+// 		if(onlyNumbers(email_after_dot) === true){ email_validation = false; }
+
+// 		if(email_validation === true){
+// 			scan_api_call();
+// 		}
+// 	});
+
+	/* Form Validation */
+	jQuery(document).on('submit','#wp-free-compromised-password-form',function(event){
+		
+		console.log( 'Handling wp-free-compromised-password-form validation' );
+		var form = '#wp-free-compromised-password-form'; 
+		event.preventDefault();
+
+		jQuery(form+' .notif-success').hide();
+		jQuery(form+' .notif-error').hide();
+
+		jQuery(form+' .jet-form__submit').prop("disabled", false);
+		jQuery(form+' .jet-form__submit').removeAttr("disabled");
+
+		jQuery(form+' .jet-form__submit').css('visibility', 'hidden');
+		setTimeout(function(){
+			jQuery('.form_loader').css('display','block');
+		}, 1000);
+
+
+		var validations = free_compromised_password_scan_form_check_validation_messages();
+		if(validations['status'] === false){
+
+			if(validations['firstname'] === false){
+				jQuery(form+' .jet-form-col.firstname-field').append(notifError(validations['firstname-message']));
+			}
+
+			if(validations['lastname'] === false){
+				jQuery(form+' .jet-form-col.lastname-field').append(notifError(validations['lastname-message']));
+			}
+
+			if(validations['email'] === false){
+				jQuery(form+' .jet-form-col.email-field').append(notifError(validations['email-message']));
+			}
+
+			jQuery(form).append(notifError(validations['status-message']));
+			jQuery(form+' .field-type-submit .jet-form__submit').prop("disabled", false);
+
+			jQuery('.form_loader').css('display','none');
+			setTimeout(function(){
+				jQuery(form+' .jet-form__submit').show();
+				jQuery(form+' .jet-form__submit').css('visibility', 'visible');
+				jQuery(form+' .field-type-submit .jet-form__submit').prop("disabled", false);
+				jQuery('.form_loader').css('display','none');
+			}, 1000);
+
+			return false;
+		}
+		
+		if(validations['status'] === true){
+			elementorProFrontend.modules.popup.showPopup( { id: 1278 } );
+			var redirect_url = jQuery(form+' .field-type-submit').attr('scan-result');
+			window.location.replace(redirect_url);
+			return true;
+		}
+	});
+
+	/* 
+	** Type: Function
+	** Action: Check field validation */
+	function free_compromised_password_scan_form_check_validation_messages(messages){
+
+		var form = "#wp-free-compromised-password-form";
+		var validation = [];
+		validation["status"] = true;
+
+
+		/* Email */
+		var email = jQuery(form+' .jet-form-row #email').val();
+		var email_validation = true;
+			
+		if(validateEmail(email) === false){ email_validation = false; }
+			
+		var email = email.split('@'); email_before_at = email[0];
+		if(onlyNumbers(email_before_at) === true){ email_validation = false; }
+			
+		email = email[1].split('.'); var email_before_dot = email[0];
+		if(onlyNumbers(email_before_dot) === true){ email_validation = false; }
+			
+		var email_after_dot = email[1];
+		if(onlyNumbers(email_after_dot) === true){ email_validation = false; }
+			
+		if(email_validation === false){
+			validation['status'] = false;
+			validation['email'] = false;
+			validation['email-message'] = jQuery(form+' .email-field').attr('validation-message');
+		}
+
+		/* First Name */
+		var firstname = jQuery(form+' .jet-form-row #firstname').val();
+		if(onlyLettersAndSpaces(firstname) === false){
+			validation['status'] = false;
+			validation['firstname'] = false;
+			validation['firstname-message'] = jQuery(form+' .firstname-field').attr('validation-message');
+		}
+
+		/* Last Name */
+		var lastname = jQuery(form+' .jet-form-row #lastname').val();
+		if(onlyLettersAndSpaces(lastname) === false){
+			validation['status'] = false;
+			validation['lastname'] = false;
+			validation['lastname-message'] = jQuery(form+' .lastname-field').attr('validation-message');
+		}
+
+		//if(validation['status'] === true){ validation['status-message'] = messages.submit_successfull; }
+		if(validation['status'] === false){ validation['status-message'] = jQuery(form+' .field-type-submit').attr('validation-message'); }
+
+		return validation;
+	}
+
+	/* 
+	** Type: Function
+	** Action: Validation fucntions */
+	function onlyLettersAndSpaces(str) {
+		//return /^[a-zA-Z-' ]*$/.test(str);
+		return /^[a-zA-Z]+[- ']{0,1}[a-zA-Z]+$/.test(str);
+	}
+
+	function onlyNumbers(str) {
+		return /^[0-9]+$/.test(str);
+	}
+
+	function validateEmail(email) {
+		var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+		return emailReg.test( email );
+	}  
+
+	/*
+	** Type: Function
+	** Action: Notification Messages */
+	function notifSuccess(str) {
+
+		var base_url = window.location.origin;
+		var notif = "";
+		notif += "<div class='notif-success'>";
+			notif += "<img class='icon' src='"+base_url+"/wp-content/uploads/2022/09/Icon.svg' width='56' height='56'>";
+			notif += "<span class='message'>"+str+"</span>";
+		notif += "</div>";
+		return notif;
+	}
+	function notifError(str) {
+		return '<span class="notif-error">'+str+'</span>';
+	}
+
+	/*
+	** Type:Function
+	** Action: Fetch API data */
+	function scan_api_call(){
+
+		var base_url = window.location.origin;
+		var ajaxscript = base_url+"/wp-admin/admin-ajax.php";
+		var form = '#wp-free-compromised-password-form'; 
+		var email = jQuery(form+' .jet-form-row #email').val();
+
+		jQuery(form+' .jet-form-col.email-field .notif-error').remove();
+
+		jQuery(form+' .field-type-submit button').attr('disabled');
+		jQuery(form+' .field-type-submit button').addClass('submit-disabled');
+
+
+		jQuery.ajax({
+		    url: ajaxscript,
+		    data: {
+		        "action": "defendify_website_scan_ajax_controller",
+		        "email": email,
+		    },
+		    success: function(data){
+
+				jQuery(form+' .field-type-submit').attr('scan-result',data);
+		    	//window.location.replace(data);
+
+					jQuery(form+' .jet-form-col.email-field .notif').remove();
+				jQuery(form+' .jet-form-col.email-field').append('<span class="notif-success">Email verified.</span>');
+				jQuery(form+' .field-type-submit button').removeAttr('disabled');
+				jQuery(form+' .field-type-submit button').removeClass('submit-disabled');
+				
+				setTimeout(function() { 
+					jQuery(form+' .jet-form-col.email-field .notif-success').remove();
+					jQuery('#wp-free-compromised-password-form .field-type-submit .submit-type-reload').show();
+  					jQuery('#wp-free-compromised-password-form .field-type-submit .jet-form__submit-wrap .verify-email').hide();
+				}, 2000);
+
+		   }
+		});
+
+		return;
+	}
+
+</script>
