@@ -1,0 +1,73 @@
+<script>
+  var isButtonSelected = false;
+  // Wait for the DOM to be fully loaded
+  document.addEventListener("DOMContentLoaded", function () {
+    // Get all elements with the class "uui-testimonial11_content-right"
+    var testimonialContentRightElements = document.querySelectorAll(
+      ".uui-testimonial11_content-right"
+    );
+
+    // Initialize an array to store the selected buttons
+    var selectedButtons = [];
+
+    // Iterate through the "uui-testimonial11_content-right" elements
+    testimonialContentRightElements.forEach(function (contentRightElement) {
+      // Find all elements with class "uui-button" and attribute "testimonial-button" inside each "uui-testimonial11_content-right"
+      var buttonsInsideContentRight = contentRightElement.querySelectorAll(
+        ".uui-button-row[testimonial-button]"
+      );
+
+      // Add the selected buttons to the array if they have the label "Download Case Study"
+      buttonsInsideContentRight.forEach(function (button) {
+        if (button.textContent === "Download Case Study") {
+          selectedButtons.push(button);
+        }
+      });
+    });
+
+    selectedButtons.forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        event.preventDefault();
+        isButtonSelected = true;
+
+        // Get the value of the "testimonial-button" attribute
+        var testimonialButtonValue = button.getAttribute("testimonial-button");
+        createHsForm(testimonialButtonValue);
+
+        // Toggle the class "cs-modal-testimonial" to display as 'flex'
+        var modal = document.querySelector(
+          `.cs-modal-testimonial[cs-modal="${testimonialButtonValue}"]`
+        );
+
+        if (modal) {
+          modal.style.display = "flex";
+
+          var closestH4 = document.querySelector(
+            `[cs-modal="${testimonialButtonValue}"] .cs-modal_form-wrapper .heading-style-h4`
+          );
+          if (closestH4) {
+            closestH4.style.display = "flex";
+          }
+
+          var successMessageDisplayOnLoad = document.querySelector(
+            `.hubspot-case-study-tml[hubspot-cs-reference="${testimonialButtonValue}"] .hubspot-success-message-tml`
+          );
+          if (successMessageDisplayOnLoad) {
+            successMessageDisplayOnLoad.style.display = "none";
+          }
+
+          var closeButton = modal.querySelector(
+            `.cs-modal-inner-wrapper-close[cs-modal-close="${testimonialButtonValue}"]`
+          );
+
+          if (closeButton) {
+            closeButton.addEventListener("click", function () {
+              // Set the modal display to 'none' when the close button is clicked
+              modal.style.display = "none";
+            });
+          }
+        }
+      });
+    });
+  });
+</script>

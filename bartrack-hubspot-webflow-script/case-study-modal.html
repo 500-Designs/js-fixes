@@ -1,0 +1,136 @@
+<script
+  charset="utf-8"
+  type="text/javascript"
+  src="//js.hsforms.net/forms/embed/v2.js"
+></script>
+<script>
+  var buttons = document.querySelectorAll(
+    ".resources_list .blog-button-link a"
+  );
+  var isModalOpen = false;
+
+  var hubspotRequestSent = false;
+  var isSubmitted = false;
+
+  function handleClick(event) {
+    const clickedElement = event.target;
+    const parentElement = clickedElement.parentNode;
+
+    const parentId = parentElement.id;
+
+    if (isModalOpen) {
+      const elementClicked = event.target;
+
+      const parentDivModalClose = elementClicked.closest(
+        ".cs-modal-inner-wrapper-close"
+      );
+
+      if (parentDivModalClose) {
+        isModalOpen = false;
+        hubspotRequestSent = false;
+      }
+      return; // Do nothing if a modal is open
+    }
+
+    if (!clickedElement.closest(".resources_list")) {
+      // Click happened outside of 'resources_list', do nothing
+      return;
+    }
+
+    hideModalsWithNameMismatch(parentId);
+
+    if (clickedElement.classList.length > 0) {
+      const clickedClass = clickedElement.classList[0];
+      if (clickedClass === "pagination_page-button") {
+        // Empty the buttons variable
+        buttons.forEach(function (button) {
+          button.removeEventListener("click", handleButtonClick);
+        });
+        buttons = [];
+
+        // Re-initialize the buttons variable
+        buttons = document.querySelectorAll(
+          ".resources_list .blog-button-link a"
+        );
+
+        buttons.forEach(function (button) {
+          button.addEventListener("click", handleButtonClick);
+        });
+      }
+    }
+  }
+
+  // Attach click event listener to the document
+  if (!isModalOpen) {
+    document.addEventListener("click", handleClick);
+  } else {
+    document.removeEventListener("click", handleClick);
+  }
+
+  function hideModalsWithNameMismatch(name) {
+    // Get all elements with class global_cs-modal
+    var modals = document.querySelectorAll(
+      ".global_cs-modal[modal-name-reference]"
+    );
+
+    // Iterate through each modal
+    for (var i = 0; i < modals.length; i++) {
+      var modal = modals[i];
+      // Get the parent div
+      var parentDiv = modal.parentElement;
+      // Check if the parent div has the modal-name-reference attribute
+      if (
+        parentDiv &&
+        modal.getAttribute("modal-name-reference") &&
+        parentDiv.getAttribute("blog-item-type") === "Case Studies"
+      ) {
+        // Get the value of the modal-name-reference attribute
+
+        var referenceName = modal.getAttribute("modal-name-reference");
+
+        // Check if the referenceName does not match the provided name parameter
+        if (referenceName !== name) {
+          // Hide the modal by setting its display property to 'none'
+          modal.style.opacity = 0;
+          modal.style.display = "none";
+          modal.classList.add("w-condition-invisible");
+        } else if (referenceName === name) {
+          const formCheck = parentDiv.querySelector(
+            `.hubspot-case-study[hubspot-cs-reference="${name}"] .hs-form`
+          );
+
+          var closestH4 = document.querySelector(
+            `[modal-name-reference="${name}"] .cs-modal_form-wrapper .heading-style-h4`
+          );
+          if (closestH4) {
+            closestH4.style.display = "flex";
+          }
+
+          var successMessageDisplayOnLoad = document.querySelector(
+            `.hubspot-case-study[hubspot-cs-reference="${name}"] .hubspot-success-message`
+          );
+          if (successMessageDisplayOnLoad) {
+            successMessageDisplayOnLoad.style.display = "none";
+          }
+
+          createForm(name);
+          if (!formCheck) {
+            hubspotRequestSent = false;
+          } else {
+            isModalOpen = true;
+          }
+
+          var featuredItemHide = document.querySelector(
+            "[featured-modal-name-reference]"
+          );
+          featuredItemHide.style.display = "none";
+          featuredItemHide.classList.add("w-condition-invisible");
+
+          modal.style.opacity = 1;
+          modal.style.display = "flex";
+          modal.classList.remove("w-condition-invisible");
+        }
+      }
+    }
+  }
+</script>
