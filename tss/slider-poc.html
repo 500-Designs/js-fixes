@@ -1,208 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Swiper demo</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
 
-<head>
-  <meta charset="utf-8" />
-  <title>Swiper demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
-  <!-- Link Swiper's CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <style>
+      html,
+      body {
+        position: relative;
+        height: 100%;
+      }
 
-  <!-- Custom cursor styles -->
-  <style>
-    html,
-    body {
-      position: relative;
-      height: 100%;
-    }
+      body {
+        background: #fff;
+        font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        color: #000;
+        margin: 0;
+        padding: 0;
+        cursor: none;
+      }
 
-    body {
-      background: #eee;
-      font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
-      font-size: 14px;
-      color: #000;
-      margin: 0;
-      padding: 0;
-      cursor: none;
-    }
+      .custom-cursor {
+        pointer-events: none;
+        position: fixed;
+        width: 165px;
+        height: 165px;
+        border-radius: 50%;
+        background: black;
+        color: #87eba8;
+        font-family: "Inter";
+        font-size: 28px;
+        font-weight: 600;
+        line-height: 32px;
+        letter-spacing: 0.5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+        user-drag: none;
+        z-index: 9999;
+      }
 
-    .custom-cursor {
-      pointer-events: none;
-      /* Prevent the cursor from blocking interactions */
-      position: fixed;
-      /* Keep the cursor at a fixed position */
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: black;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 14px;
-      user-drag: none;
-      z-index: 9999;
-      /* Ensure the cursor is above other elements */
-    }
+      .swiper-container {
+        width: 100%;
+        height: 100%;
+      }
 
-    .swiper-container {
-      width: 100%;
-      height: 100%;
-    }
+      .swiper-slide {
+        text-align: left;
+        font-size: 18px;
+        background: #f8f8f8;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+        transition: background 0.3s;
+        position: relative;
+        overflow: hidden;
+        height: 620px;
+        width: 432px;
+        border: 1px solid #c4c4c5;
+      }
 
-    .swiper-slide {
-      text-align: center;
-      font-size: 18px;
-      background: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: background 0.3s;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
+      .swiper-slide img {
+        display: block;
+        width: 400px;
+        height: 300px;
+        object-fit: cover;
+      }
 
-    .swiper-slide img {
-      display: block;
-      width: 400px;
-      /* Set the desired image width */
-      height: 300px;
-      /* Set the desired image height */
-      object-fit: cover;
-    }
+      .swiper-slide:hover {
+        background-color: #87eba8;
+      }
 
-    .swiper-slide:hover {
-      background-color: #000000;
-    }
+      .description {
+        display: none;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 80%;
+        color: white;
+        text-align: left;
+        padding: 24px;
+      }
 
-    .description {
-      display: none;
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 5px;
-      max-height: 60px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+      .swiper-slide:hover .description {
+        display: flex;
+        position: relative;
+      }
 
-    .swiper-slide:hover .description {
-      display: block;
-    }
-  </style>
-</head>
+      .header {
+        font-family: "Clash Grotesk";
+        font-size: 28px;
+        font-weight: 400;
+        line-height: 32px;
+        text-align: left;
+        padding: 24px;
+      }
 
-<body>
-  <!-- Custom cursor (outside of Swiper container) -->
-  <div class="custom-cursor">drag</div>
+      .slide-number {
+        display: block;
+        font-size: 16px;
+        color: #040e13;
+        z-index: 1;
+        font-family: Clash Grotesk;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 28px;
+        letter-spacing: -0.25px;
+        padding: 24px 32px;
+      }
+    </style>
+  </head>
 
-  <!-- Swiper -->
-  <div class="swiper-container mySwiper">
-    <div class="swiper-wrapper">
-      <div class="swiper-slide">
-        <img
-          src="https://images.unsplash.com/photo-1698413536557-8e4119606fe3?auto=format&fit=crop&q=80&w=400&h=300&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="Slide 1" />
-        <div class="description">
-          <p>Description for Slide 1</p>
+  <body>
+    <div class="custom-cursor">DRAG</div>
+    <div class="swiper-container mySwiper">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <div class="slide-number">01</div>
+          <img
+            src="https://s3-alpha-sig.figma.com/img/b4d6/486f/a232d633caad0052724af38f9f30f73d?Expires=1699833600&Signature=KRKCw~nu-DhykohLZUOFkQQFaVTc~TnPZYCYkRQVFR3kpfGOKGN91paDAqtAqxPZdrcuvpRGuVmUPjBy4lzB1saoc4YZHBlOn9PoLLSpEbkdFxDvQj4-OPCRw0zX6QFmfrH3baH7lIXhibux4~k~JkjlCMmTULZ5tQwL~5CONN791GpkW3hVj60FsPTQqjHIIYxUPGw6Hz48f4PuEl4SV~tXvH4YeeK0qFi~8fxZ42gpfWU4eX0VqSLc0cv3HnEVM~UKMygKnAiLJmuwBdGsDN6nm-B8n1ybfQ6n3830TDTR8qx8~Ua4QeUPiHt-Ask53qL4mbWb993ZPsxSCe1IXQ__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4"
+            alt="Slide 1"
+          />
+          <div class="header">Header for Slide 1</div>
+          <div class="description">
+            <p>
+              Boost internal communications and maintain quick-flowing data with
+              robust, managed network infrastructures built for reliable,
+              up-to-date use.
+            </p>
+          </div>
         </div>
-      </div>
-      <div class="swiper-slide">
-        <img
-          src="https://images.unsplash.com/photo-1698413536557-8e4119606fe3?auto=format&fit=crop&q=80&w=400&h=300&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="Slide 2" />
-        <div class="description">
-          <p>Description for Slide 2</p>
+        <div class="swiper-slide">
+          <div class="slide-number">02</div>
+          <img
+            src="https://s3-alpha-sig.figma.com/img/29cf/42a7/49acbb343a8310339e44666e7881fbd8?Expires=1699833600&Signature=C2A6i1UHxGWXSITHqv1BdpiZXSeIjIpcYe-Xwyg~DZ88xKpFrGD94sgtl~-xFztwUFMrMoWc0YzVTUcdWr-VizECo4c2i49gp-tk4vkhelFuyKU86BVtonevc3jmxMwZ2LEfpntze~IcX4US6jtQZPfGt98Xm5rmT-AJPbrcndaOCuphC5VoPTsfX5J6~fhTt19jjThyKeOdzIEW~KuZmMGXCFc6MNg0L0rosQX5kyf9sa3D450Cii4Es6bRrY3GhcMfA3dcqDGplrpSvVarCm2VRuJoq~v8oSdJP1mGPCMsC0PtkYTV3DPjCGG08m75BBMmZ-eY7SvueWCK~jieOw__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4"
+            alt="Slide 2"
+          />
+          <div class="header">Header for Slide 2</div>
+          <div class="description">
+            <p>Description for Slide 2</p>
+          </div>
         </div>
-      </div>
-      <div class="swiper-slide">
-        <img
-          src="https://images.unsplash.com/photo-1698413536557-8e4119606fe3?auto=format&fit=crop&q=80&w=400&h=300&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="Slide 3" />
-        <div class="description">
-          <p>Description for Slide 3</p>
+        <div class="swiper-slide">
+          <div class="slide-number">03</div>
+          <img
+            src="https://s3-alpha-sig.figma.com/img/b4d6/486f/a232d633caad0052724af38f9f30f73d?Expires=1699833600&Signature=KRKCw~nu-DhykohLZUOFkQQFaVTc~TnPZYCYkRQVFR3kpfGOKGN91paDAqtAqxPZdrcuvpRGuVmUPjBy4lzB1saoc4YZHBlOn9PoLLSpEbkdFxDvQj4-OPCRw0zX6QFmfrH3baH7lIXhibux4~k~JkjlCMmTULZ5tQwL~5CONN791GpkW3hVj60FsPTQqjHIIYxUPGw6Hz48f4PuEl4SV~tXvH4YeeK0qFi~8fxZ42gpfWU4eX0VqSLc0cv3HnEVM~UKMygKnAiLJmuwBdGsDN6nm-B8n1ybfQ6n3830TDTR8qx8~Ua4QeUPiHt-Ask53qL4mbWb993ZPsxSCe1IXQ__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4"
+            alt="Slide 1"
+          />
+          <div class="header">Header for Slide 3</div>
+          <div class="description">
+            <p>
+              Boost internal communications and maintain quick-flowing data with
+              robust, managed network infrastructures built for reliable,
+              up-to-date use.
+            </p>
+          </div>
         </div>
-      </div>
-      <div class="swiper-slide">
-        <img
-          src="https://images.unsplash.com/photo-1698413536557-8e4119606fe3?auto=format&fit=crop&q=80&w=400&h=300&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="Slide 4" />
-        <div class="description">
-          <p>Description for Slide 4</p>
+        <div class="swiper-slide">
+          <div class="slide-number">04</div>
+          <img
+            src="https://s3-alpha-sig.figma.com/img/b4d6/486f/a232d633caad0052724af38f9f30f73d?Expires=1699833600&Signature=KRKCw~nu-DhykohLZUOFkQQFaVTc~TnPZYCYkRQVFR3kpfGOKGN91paDAqtAqxPZdrcuvpRGuVmUPjBy4lzB1saoc4YZHBlOn9PoLLSpEbkdFxDvQj4-OPCRw0zX6QFmfrH3baH7lIXhibux4~k~JkjlCMmTULZ5tQwL~5CONN791GpkW3hVj60FsPTQqjHIIYxUPGw6Hz48f4PuEl4SV~tXvH4YeeK0qFi~8fxZ42gpfWU4eX0VqSLc0cv3HnEVM~UKMygKnAiLJmuwBdGsDN6nm-B8n1ybfQ6n3830TDTR8qx8~Ua4QeUPiHt-Ask53qL4mbWb993ZPsxSCe1IXQ__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4"
+            alt="Slide 1"
+          />
+          <div class="header">Header for Slide 4</div>
+          <div class="description">
+            <p>
+              Boost internal communications and maintain quick-flowing data with
+              robust, managed network infrastructures built for reliable,
+              up-to-date use.
+            </p>
+          </div>
         </div>
-      </div>
-      <div class="swiper-slide">
-        <img
-          src="https://images.unsplash.com/photo-1698413536557-8e4119606fe3?auto=format&fit=crop&q=80&w=400&h=300&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="Slide 5" />
-        <div class "description">
-          <p>Description for Slide 5</p>
+        <div class="swiper-slide">
+          <div class="slide-number">05</div>
+          <img
+            src="https://s3-alpha-sig.figma.com/img/b4d6/486f/a232d633caad0052724af38f9f30f73d?Expires=1699833600&Signature=KRKCw~nu-DhykohLZUOFkQQFaVTc~TnPZYCYkRQVFR3kpfGOKGN91paDAqtAqxPZdrcuvpRGuVmUPjBy4lzB1saoc4YZHBlOn9PoLLSpEbkdFxDvQj4-OPCRw0zX6QFmfrH3baH7lIXhibux4~k~JkjlCMmTULZ5tQwL~5CONN791GpkW3hVj60FsPTQqjHIIYxUPGw6Hz48f4PuEl4SV~tXvH4YeeK0qFi~8fxZ42gpfWU4eX0VqSLc0cv3HnEVM~UKMygKnAiLJmuwBdGsDN6nm-B8n1ybfQ6n3830TDTR8qx8~Ua4QeUPiHt-Ask53qL4mbWb993ZPsxSCe1IXQ__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4"
+            alt="Slide 1"
+          />
+          <div class="header">Header for Slide 5</div>
+          <div class="description">
+            <p>
+              Boost internal communications and maintain quick-flowing data with
+              robust, managed network infrastructures built for reliable,
+              up-to-date use.
+            </p>
+          </div>
         </div>
-      </div>
-      <div class="swiper-slide">
-        <img
-          src="https://images.unsplash.com/photo-1698413536557-8e4119606fe3?auto=format&fit=crop&q=80&w=400&h=300&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="Slide 6" />
-        <div class="description">
-          <p>Description for Slide 6</p>
+        <div class="swiper-slide">
+          <div class="slide-number">06</div>
+          <img
+            src="https://s3-alpha-sig.figma.com/img/b4d6/486f/a232d633caad0052724af38f9f30f73d?Expires=1699833600&Signature=KRKCw~nu-DhykohLZUOFkQQFaVTc~TnPZYCYkRQVFR3kpfGOKGN91paDAqtAqxPZdrcuvpRGuVmUPjBy4lzB1saoc4YZHBlOn9PoLLSpEbkdFxDvQj4-OPCRw0zX6QFmfrH3baH7lIXhibux4~k~JkjlCMmTULZ5tQwL~5CONN791GpkW3hVj60FsPTQqjHIIYxUPGw6Hz48f4PuEl4SV~tXvH4YeeK0qFi~8fxZ42gpfWU4eX0VqSLc0cv3HnEVM~UKMygKnAiLJmuwBdGsDN6nm-B8n1ybfQ6n3830TDTR8qx8~Ua4QeUPiHt-Ask53qL4mbWb993ZPsxSCe1IXQ__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4"
+            alt="Slide 1"
+          />
+          <div class="header">Header for Slide 6</div>
+          <div class="description">
+            <p>
+              Boost internal communications and maintain quick-flowing data with
+              robust, managed network infrastructures built for reliable,
+              up-to-date use.
+            </p>
+          </div>
         </div>
-      </div>
-      <div class="swiper-slide">
-        <img
-          src="https://images.unsplash.com/photo-1698413536557-8e4119606fe3?auto=format&fit=crop&q=80&w=400&h=300&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="Slide 7" />
-        <div class="description">
-          <p>Description for Slide 7</p>
+        <div class="swiper-slide">
+          <div class="slide-number">07</div>
+          <img
+            src="https://s3-alpha-sig.figma.com/img/b4d6/486f/a232d633caad0052724af38f9f30f73d?Expires=1699833600&Signature=KRKCw~nu-DhykohLZUOFkQQFaVTc~TnPZYCYkRQVFR3kpfGOKGN91paDAqtAqxPZdrcuvpRGuVmUPjBy4lzB1saoc4YZHBlOn9PoLLSpEbkdFxDvQj4-OPCRw0zX6QFmfrH3baH7lIXhibux4~k~JkjlCMmTULZ5tQwL~5CONN791GpkW3hVj60FsPTQqjHIIYxUPGw6Hz48f4PuEl4SV~tXvH4YeeK0qFi~8fxZ42gpfWU4eX0VqSLc0cv3HnEVM~UKMygKnAiLJmuwBdGsDN6nm-B8n1ybfQ6n3830TDTR8qx8~Ua4QeUPiHt-Ask53qL4mbWb993ZPsxSCe1IXQ__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4"
+            alt="Slide 1"
+          />
+          <div class="header">Header for Slide 7</div>
+          <div class="description">
+            <p>
+              Boost internal communications and maintain quick-flowing data with
+              robust, managed network infrastructures built for reliable,
+              up-to-date use.
+            </p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Swiper JS -->
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        var swiper = new Swiper(".mySwiper", {
+          slidesPerView: 4,
+          centeredSlides: true,
+          spaceBetween: 0,
+          grabCursor: true,
+          pagination: {
+            el: ".swiper-pagination",
+            clickable: true,
+          },
+        });
 
-  <!-- Initialize Swiper and custom cursor -->
-  <script>
-    var cursor = document.querySelector(".custom-cursor");
+        const cursor = $(".custom-cursor");
+        gsap.set(cursor, {
+          xPercent: -50,
+          yPercent: -50,
+        });
 
-    var swiper = new Swiper(".mySwiper", {
-      slidesPerView: 4,
-      centeredSlides: true,
-      spaceBetween: 30,
-      grabCursor: true,
-      pagination: {
-        el: ".swiper-pagination",
-        clickable: true,
-      },
-    });
-
-    document.body.addEventListener("mousemove", (e) => {
-      cursor.style.left = e.clientX - cursor.clientWidth / 2 + "px";
-      cursor.style.top = e.clientY - cursor.clientHeight / 2 + "px";
-    });
-
-    var isDragging = false;
-
-    cursor.addEventListener("mousedown", () => {
-      isDragging = true;
-    });
-
-    document.body.addEventListener("mouseup", () => {
-      isDragging = false;
-    });
-
-    document.body.addEventListener("mousemove", (e) => {
-      if (isDragging) {
-        cursor.style.left = e.clientX - cursor.clientWidth / 2 + "px";
-        cursor.style.top = e.clientY - cursor.clientHeight / 2 + "px";
-      }
-    });
-  </script>
-</body>
-
+        $(document).on("pointermove", function (e) {
+          gsap.to(cursor, {
+            x: e.clientX,
+            y: e.clientY,
+          });
+        });
+      });
+    </script>
+  </body>
 </html>
