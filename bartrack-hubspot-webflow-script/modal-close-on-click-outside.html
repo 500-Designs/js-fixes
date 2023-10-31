@@ -1,0 +1,52 @@
+<style>
+  .disable-scroll {
+    overflow: hidden;
+  }
+
+  .team-modal {
+    display: none;
+  }
+  .team-modal.active {
+    display: block;
+  }
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const teamItems = document.querySelectorAll(".team_item");
+
+    teamItems.forEach((teamItem) => {
+      teamItem.addEventListener("click", () => {
+        const modal = teamItem.querySelector(".team_modal");
+        document.body.classList.add("disable-scroll");
+        modal.classList.add("active");
+
+        modal.addEventListener("click", () => {
+          event.stopPropagation();
+
+          const activeModal = document.querySelector(".team_modal.active");
+          if (activeModal) {
+            console.log(
+              "activeModal team-modal-inner",
+              activeModal.querySelector(".team-modal-inner")
+            );
+          }
+
+          if (activeModal) {
+            const modalContent = activeModal.querySelector(".team-modal-inner");
+
+            if (
+              !modalContent.contains(event.target) ||
+              event.target.closest(".uui-team_icon-close")
+            ) {
+              modal.style.display = "none";
+              modal.style.opacity = 0;
+
+              document.body.classList.remove("disable-scroll");
+              modal.classList.remove("active");
+            }
+          }
+        });
+      });
+    });
+  });
+</script>
