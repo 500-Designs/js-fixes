@@ -1,0 +1,80 @@
+#tssSlider {
+    margin: 50px 0;
+    position: relative;
+}
+
+figure {
+  margin: 0;
+}
+
+
+.tss-swiper .swiper-slide figure {
+  position: relative;
+  overflow: hidden;
+}
+
+.tss-swiper .swiper-slide img {
+  width: 100%;
+  -o-object-fit: cover;
+  object-fit: cover;
+}
+
+.tss-swiper .swiper-slide figcaption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transform: translateY(20%);
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  transition: all 0.4s;
+}
+
+.tss-swiper .swiper-slide:hover figcaption {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+@media (min-width: 768px) {
+  .tss-swiper .swiper-slide img {
+    height: 370px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .tss-swiper .swiper-slide img {
+    height: 420px;
+  }
+}
+
+.tss-cursor {
+  position: fixed;
+  left: var(--cursor-x);
+  top: var(--cursor-y);
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background: black;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+body.show-custom-cursor .tss-cursor {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
